@@ -133,6 +133,9 @@ export class GameScene extends Phaser.Scene implements AttackWorld, EnemyWorld {
   }
 
   private presentBoons(): void {
+    // Sweep any in-flight enemy bullets so a stray shot can't hit the player
+    // while the boon screen is up.
+    this.enemyProjectiles.clear(true, true);
     this.pendingBoons = pickRandomBoons(3);
     const cx = this.scale.width / 2;
     const cy = this.scale.height / 2;

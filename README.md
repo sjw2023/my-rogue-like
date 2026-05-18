@@ -28,6 +28,7 @@ Other scripts:
 npm run build      # type-check + bundle to dist/
 npm run preview    # serve the built bundle
 npm run typecheck  # tsc --noEmit
+npm test           # run the Vitest unit tests
 ```
 
 ## Controls

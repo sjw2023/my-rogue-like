@@ -8,6 +8,7 @@ const PREFERRED_MAX = 320;
 const STRAFE_SCALE = 0.5;
 
 const FIRE_COOLDOWN_MS = 1600;
+const FIRE_FIRST_SHOT_JITTER_MS = 800;
 const BULLET_SPEED = 300;
 const BULLET_DAMAGE = 12;
 const BULLET_SIZE = 12;
@@ -26,8 +27,10 @@ export class RangedEnemy extends Enemy {
       maxHp: 30,
       speed: 95,
     });
-    // Wind-up before the first shot so a room never opens with instant fire.
-    this.nextFireAt = scene.time.now + FIRE_COOLDOWN_MS;
+    // Wind-up before the first shot, jittered so a room's shooters don't all
+    // fire in perfect unison.
+    this.nextFireAt =
+      scene.time.now + FIRE_COOLDOWN_MS + Phaser.Math.Between(0, FIRE_FIRST_SHOT_JITTER_MS);
   }
 
   act(player: Phaser.Types.Math.Vector2Like, world: EnemyWorld): void {

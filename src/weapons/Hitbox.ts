@@ -22,8 +22,10 @@ export class Hitbox extends Phaser.Physics.Arcade.Sprite {
     h: number,
     damage: number,
     lifetimeMs: number,
+    color: number = 0xffffaa,
   ) {
-    super(scene, x, y, makeRectTexture(scene, `hb-${w}x${h}`, w, h, 0xffffaa));
+    const key = `hb-${w}x${h}-${color.toString(16)}`;
+    super(scene, x, y, makeRectTexture(scene, key, w, h, color));
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setAlpha(0.45);

@@ -47,6 +47,7 @@ npm run typecheck  # tsc --noEmit
 
 - **Combat**: melee Sword and ranged Bow, swappable mid-room
 - **Dodge**: short dash with brief invulnerability
+- **Enemies**: melee chasers plus ranged shooters that kite and fire projectiles
 - **Rooms**: clear all enemies → green door appears → next room is harder
 - **Boons**: between rooms, pick 1 of 3 random power-ups (damage, speed, max HP, cooldowns, dash strike)
 - **Meta-progression**: enemies drop shards; spend them on the title screen for permanent buffs that persist across runs
@@ -57,7 +58,7 @@ npm run typecheck  # tsc --noEmit
 src/
   main.ts          Phaser bootstrap, registers all scenes
   scenes/          TitleScene, GameScene, DeathScene
-  entities/        Player, Enemy
+  entities/        Player + Enemy (abstract) → MeleeEnemy, RangedEnemy
   weapons/         Weapon (abstract) + Sword, Bow, Hitbox
   boons/           Boon interface + concrete boon list
   meta/            Upgrades + MetaState (localStorage save/load)
@@ -66,7 +67,6 @@ src/
 
 ## Roadmap
 
-- Enemy variety (ranged shooter as a second `Enemy` subclass)
 - "Erase save" button on the title screen
 - Particle effects, dash trail, camera punch on kill
 - Replace placeholder rectangles with real sprite art

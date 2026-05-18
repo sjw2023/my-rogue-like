@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { makeRectTexture } from '../utils/textures';
+import { Hitbox } from '../weapons/Hitbox';
 
 const KNOCKBACK_SPEED = 320;
 
@@ -9,6 +10,19 @@ export interface EnemyConfig {
   color: number;
   maxHp: number;
   speed: number;
+}
+
+/** What an enemy needs from the scene to fire at the player. */
+export interface EnemyWorld {
+  spawnEnemyProjectile(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    damage: number,
+    lifetimeMs: number,
+    color: number,
+  ): Hitbox;
 }
 
 /**
@@ -31,7 +45,7 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   /** Per-frame AI. Called by GameScene for every active enemy. */
-  abstract act(player: Phaser.Types.Math.Vector2Like): void;
+  abstract act(player: Phaser.Types.Math.Vector2Like, world: EnemyWorld): void;
 
   knockbackFrom(x: number, y: number): void {
     const dx = this.x - x;

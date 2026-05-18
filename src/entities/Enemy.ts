@@ -15,7 +15,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setBounce(0.4);
   }
 
-  chase(target: Phaser.Math.Vector2Like): void {
+  chase(target: Phaser.Types.Math.Vector2Like): void {
     const dx = target.x - this.x;
     const dy = target.y - this.y;
     const len = Math.hypot(dx, dy) || 1;

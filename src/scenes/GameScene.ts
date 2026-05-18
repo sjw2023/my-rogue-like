@@ -59,9 +59,9 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
 
     this.physics.add.overlap(this.playerHitboxes, this.enemies, (hb, e) => {
       const hitbox = hb as Hitbox;
-      if (hitbox.hasHit(e)) return;
-      hitbox.markHit(e);
       const enemy = e as Enemy;
+      if (hitbox.hasHit(enemy)) return;
+      hitbox.markHit(enemy);
       enemy.knockbackFrom(hitbox.x, hitbox.y);
       const ex = enemy.x;
       const ey = enemy.y;
@@ -85,7 +85,7 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
     ];
   }
 
-  update(time: number, delta: number): void {
+  update(_time: number, delta: number): void {
     this.player.update(delta);
     this.enemies.getChildren().forEach((e) => (e as Enemy).chase(this.player));
     this.hpText.setText(

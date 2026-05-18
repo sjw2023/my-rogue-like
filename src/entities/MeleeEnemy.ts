@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Enemy } from './Enemy';
+import { Enemy, EnemyWorld } from './Enemy';
 
 /** Chaser enemy: steers straight at the player and deals contact damage. */
 export class MeleeEnemy extends Enemy {
@@ -13,7 +13,7 @@ export class MeleeEnemy extends Enemy {
     });
   }
 
-  act(player: Phaser.Types.Math.Vector2Like): void {
+  act(player: Phaser.Types.Math.Vector2Like, _world: EnemyWorld): void {
     this.steer(player.x - this.x, player.y - this.y);
   }
 }

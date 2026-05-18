@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/Player';
-import { Enemy } from '../entities/Enemy';
+import { Enemy, EnemyWorld } from '../entities/Enemy';
 import { MeleeEnemy } from '../entities/MeleeEnemy';
+import { RangedEnemy } from '../entities/RangedEnemy';
 import { Hitbox } from '../weapons/Hitbox';
 import { AttackWorld } from '../weapons/Weapon';
 import { makeRectTexture } from '../utils/textures';
@@ -15,10 +16,11 @@ function bar(ratio: number): string {
   return '[' + '█'.repeat(filled) + '░'.repeat(BAR_LEN - filled) + ']';
 }
 
-export class GameScene extends Phaser.Scene implements AttackWorld {
+export class GameScene extends Phaser.Scene implements AttackWorld, EnemyWorld {
   private player!: Player;
   private enemies!: Phaser.Physics.Arcade.Group;
   private playerHitboxes!: Phaser.Physics.Arcade.Group;
+  private enemyProjectiles!: Phaser.Physics.Arcade.Group;
   private hpText!: Phaser.GameObjects.Text;
   private cdText!: Phaser.GameObjects.Text;
   private door?: Phaser.Physics.Arcade.Sprite;
@@ -45,6 +47,7 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
 
     this.enemies = this.physics.add.group({ runChildUpdate: false });
     this.playerHitboxes = this.physics.add.group({ allowGravity: false });
+    this.enemyProjectiles = this.physics.add.group({ allowGravity: false });
 
     this.player = new Player(this, this.scale.width / 2, this.scale.height / 2);
     MetaState.load().applyTo(this.player);
@@ -71,6 +74,12 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
       if (hitbox.destroyOnHit) hitbox.destroy();
     });
 
+    this.physics.add.overlap(this.player, this.enemyProjectiles, (_p, b) => {
+      const bullet = b as Hitbox;
+      this.player.takeDamage(bullet.damage);
+      if (bullet.destroyOnHit) bullet.destroy();
+    });
+
     this.hpText = this.add
       .text(16, 12, '', { fontFamily: 'monospace', fontSize: '16px', color: '#dddddd' })
       .setScrollFactor(0);
@@ -88,7 +97,7 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
 
   update(_time: number, delta: number): void {
     this.player.update(delta);
-    this.enemies.getChildren().forEach((e) => (e as Enemy).act(this.player));
+    this.enemies.getChildren().forEach((e) => (e as Enemy).act(this.player, this));
     this.hpText.setText(
       `HP ${this.player.getHp()}/${this.player.getMaxHp()}    Room ${this.currentRoom}    Shards ${this.shardsThisRun}`,
     );
@@ -172,8 +181,10 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
   }
 
   private startRoom(): void {
-    const count = 2 + this.currentRoom;
-    for (let i = 0; i < count; i++) this.spawnEnemy();
+    const total = 2 + this.currentRoom;
+    const ranged =
+      this.currentRoom >= 2 ? Math.min(Math.floor(this.currentRoom / 2), total - 1) : 0;
+    for (let i = 0; i < total; i++) this.spawnEnemy(i < ranged);
   }
 
   private openDoor(): void {
@@ -204,6 +215,20 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
     return hb;
   }
 
+  spawnEnemyProjectile(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    damage: number,
+    lifetimeMs: number,
+    color: number,
+  ): Hitbox {
+    const hb = new Hitbox(this, x, y, w, h, damage, lifetimeMs, color);
+    this.enemyProjectiles.add(hb);
+    return hb;
+  }
+
   private creditShard(x: number, y: number): void {
     this.shardsThisRun++;
     const txt = this.add
@@ -218,11 +243,11 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
     });
   }
 
-  private spawnEnemy(): void {
+  private spawnEnemy(ranged: boolean): void {
     const margin = 80;
     const x = Phaser.Math.Between(margin, this.scale.width - margin);
     const y = Phaser.Math.Between(margin, this.scale.height - margin);
-    this.enemies.add(new MeleeEnemy(this, x, y));
+    this.enemies.add(ranged ? new RangedEnemy(this, x, y) : new MeleeEnemy(this, x, y));
   }
 
   private drawArena(): void {

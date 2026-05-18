@@ -20,4 +20,10 @@ describe('pickRandomBoons', () => {
   it('caps the count at the number of available boons', () => {
     expect(pickRandomBoons(99)).toHaveLength(ALL_BOONS.length);
   });
+
+  it('does not mutate the shared ALL_BOONS array', () => {
+    const before = [...ALL_BOONS];
+    pickRandomBoons(3);
+    expect(ALL_BOONS).toEqual(before);
+  });
 });

@@ -29,6 +29,11 @@ export const ALL_BOONS: Boon[] = [
 ];
 
 export function pickRandomBoons(count: number): Boon[] {
-  const shuffled = [...ALL_BOONS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(count, shuffled.length));
+  // Fisher-Yates — an unbiased shuffle, unlike sort() with a random comparator.
+  const pool = [...ALL_BOONS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, Math.min(count, pool.length));
 }

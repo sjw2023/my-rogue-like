@@ -57,7 +57,10 @@ export abstract class Enemy extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount: number): boolean {
     this.hp -= amount;
     this.setTint(0xffffff);
-    this.scene.time.delayedCall(80, () => this.clearTint());
+    this.scene.time.delayedCall(80, () => {
+      // The enemy may have been destroyed within the 80ms window.
+      if (this.active) this.clearTint();
+    });
     if (this.hp <= 0) {
       this.destroy();
       return true;

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
+import { MeleeEnemy } from '../entities/MeleeEnemy';
 import { Hitbox } from '../weapons/Hitbox';
 import { AttackWorld } from '../weapons/Weapon';
 import { makeRectTexture } from '../utils/textures';
@@ -42,7 +43,7 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
 
     this.drawArena();
 
-    this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: false });
+    this.enemies = this.physics.add.group({ runChildUpdate: false });
     this.playerHitboxes = this.physics.add.group({ allowGravity: false });
 
     this.player = new Player(this, this.scale.width / 2, this.scale.height / 2);
@@ -87,7 +88,7 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
 
   update(_time: number, delta: number): void {
     this.player.update(delta);
-    this.enemies.getChildren().forEach((e) => (e as Enemy).chase(this.player));
+    this.enemies.getChildren().forEach((e) => (e as Enemy).act(this.player));
     this.hpText.setText(
       `HP ${this.player.getHp()}/${this.player.getMaxHp()}    Room ${this.currentRoom}    Shards ${this.shardsThisRun}`,
     );
@@ -221,7 +222,7 @@ export class GameScene extends Phaser.Scene implements AttackWorld {
     const margin = 80;
     const x = Phaser.Math.Between(margin, this.scale.width - margin);
     const y = Phaser.Math.Between(margin, this.scale.height - margin);
-    this.enemies.add(new Enemy(this, x, y));
+    this.enemies.add(new MeleeEnemy(this, x, y));
   }
 
   private drawArena(): void {
